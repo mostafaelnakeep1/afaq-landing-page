@@ -1,23 +1,51 @@
+import React, { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform, useInView } from "motion/react";
-import { Code, Palette, TrendingUp, Globe, Languages, ArrowUpRight, Sparkles, Play, Zap, BarChart3, Sun, Moon } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import logoImg from "../imports/seedream-4.0_A_high-end_ultra-minimalist_3D_background_for_a_website_footer._A_dark_sleek_sur-0.jpg";
+import { Code, Palette, TrendingUp, Globe, Languages, ArrowUpRight, Sparkles, Play, Zap, BarChart3, Sun, Moon, MapPin, Brush, Bot, Camera, Phone } from "lucide-react";
+import logoLight from "../../public/imgs/seedream.jpg";
+import logoDark from "../../public/imgs/logo.jpeg";
 import { ServiceCard } from "./components/ServiceCard";
 import { FooterVideo } from "./components/FooterVideo";
 
 type Language = 'ar' | 'en';
 type Theme = 'dark' | 'light';
 
+const PHONE_NUMBER = "966504764145";
+const WHATSAPP_URL = `https://wa.me/${PHONE_NUMBER}`;
+const PHONE_URL = `tel:+${PHONE_NUMBER}`;
+
+const WhatsAppIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.886 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+);
+
 export default function App() {
   const [lang, setLang] = useState<Language>('ar');
   const [theme, setTheme] = useState<Theme>('dark');
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [currentVideo, setCurrentVideo] = useState<string>('');
+  const [showFloatingWA, setShowFloatingWA] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
+  const contactActionsRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
   const parallaxY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   const isDark = theme === 'dark';
+  const logoImg = isDark ? logoDark : logoLight;
+
+  // Hide floating WhatsApp button when contact-actions section is visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowFloatingWA(!entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    if (contactActionsRef.current) {
+      observer.observe(contactActionsRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
 
   const openVideoModal = (videoUrl: string) => {
     setCurrentVideo(videoUrl);
@@ -27,6 +55,47 @@ export default function App() {
   const closeVideoModal = () => {
     setVideoModalOpen(false);
     setCurrentVideo('');
+  };
+
+  const StatCounter = ({ value, label, isDark }: { value: string, label: string, isDark: boolean }) => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
+    const finalNumber = parseInt(value.replace(/[^0-9]/g, ""));
+    const suffix = value.replace(/[0-9]/g, "");
+    const [displayValue, setDisplayValue] = useState(0);
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    useEffect(() => {
+      if (isInView && !isAnimating) {
+        setIsAnimating(true);
+        let duration = 1000;
+        let intervalTime = 10;
+        let steps = duration / intervalTime;
+        let currentStep = 0;
+        const counter = setInterval(() => {
+          currentStep++;
+          const randomNum = Math.floor(Math.random() * (finalNumber * 1.5));
+          setDisplayValue(randomNum);
+          if (currentStep >= steps) {
+            clearInterval(counter);
+            setDisplayValue(finalNumber);
+          }
+        }, intervalTime);
+        return () => clearInterval(counter);
+      }
+    }, [isInView, finalNumber]);
+
+    return (
+      <div ref={ref} className="text-center">
+        <div className="text-3xl md:text-5xl font-black bg-gradient-to-r from-[#1E5FA0] to-[#F48120] bg-clip-text text-transparent flex justify-center items-center">
+          <span>{displayValue.toLocaleString()}</span>
+          <span>{suffix}</span>
+        </div>
+        <div className={`text-sm md:text-base ${isDark ? 'text-white/50' : 'text-gray-500'} mt-2`}>
+          {label}
+        </div>
+      </div>
+    );
   };
 
   const content = {
@@ -52,42 +121,15 @@ export default function App() {
       services: {
         title: "مجالاتنا",
         items: [
-          {
-            title: "البرمجة",
-            description: "تطوير تطبيقات الجوال ومواقع الويب باستخدام أحدث التقنيات العالمية",
-            icon: Code,
-            videoUrl: "videos/coding.webm"
-          },
-          {
-            title: "الأتمتة",
-            description: "حلول أتمتة ذكية تحسن كفاءة الأعمال وتوفر الوقت والجهد",
-            icon: Zap,
-            videoUrl: "videos/automation.webm"
-          },
-          {
-            title: "التصميمات",
-            description: "تصاميم إبداعية وعصرية تجمع بين الجمال والوظيفة",
-            icon: Palette,
-            videoUrl: "videos/design.webm"
-          },
-          {
-            title: "صناعة الفيديوهات",
-            description: "حملات إعلانية احترافية بعائد استثمار مضمون",
-            icon: TrendingUp,
-            videoUrl: "videos/camera.webm"
-          },
-          {
-            title: "التسويق الرقمي",
-            description: "استراتيجيات تسويقية شاملة لتعزيز حضورك الرقمي",
-            icon: Globe,
-            videoUrl: "videos/marketing.webm"
-          },
-          {
-            title: "تحليل البيانات",
-            description: "تحليلات متقدمة تساعدك على اتخاذ قرارات مبنية على البيانات",
-            icon: BarChart3,
-            videoUrl: "videos/data.webm"
-          }
+          { title: "البرمجة", description: "تطوير تطبيقات الجوال ومواقع الويب باستخدام أحدث التقنيات العالمية", icon: Code, videoUrl: "videos/coding.webm" },
+          { title: "الأتمتة", description: "حلول أتمتة ذكية تحسن كفاءة الأعمال وتوفر الوقت والجهد", icon: Zap, videoUrl: "videos/automation.webm" },
+          { title: "التصميمات", description: "تصاميم إبداعية وعصرية تجمع بين الجمال والوظيفة", icon: Palette, videoUrl: "videos/design.webm" },
+          { title: "صناعة الفيديوهات", description: "حملات إعلانية احترافية بعائد استثمار مضمون", icon: Camera, videoUrl: "videos/camera.webm" },
+          { title: "التسويق الرقمي", description: "استراتيجيات تسويقية شاملة لتعزيز حضورك الرقمي", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
+          { title: "تحليل البيانات", description: "تحليلات متقدمة تساعدك على اتخاذ قرارات مبنية على البيانات", icon: BarChart3, videoUrl: "videos/data.webm" },
+          { title: "تتبع المناديب", description: "أنظمة تتبع ذكية تتيح لك مراقبة فريقك الميداني في الوقت الفعلي وتحسين الكفاءة التشغيلية", icon: MapPin, videoUrl: "videos/location.webm" },
+          { title: "الهوية البصرية", description: "تصميم هوية بصرية متكاملة تعكس قيم علامتك التجارية وتميزها في السوق", icon: Brush, videoUrl: "videos/logo.webm" },
+          { title: "بوتات الرد الآلي", description: "بوتات ذكية تعمل على مدار الساعة للرد على عملائك وتحسين تجربتهم بشكل تلقائي", icon: Bot, videoUrl: "videos/pot.webm" }
         ]
       },
       cta: {
@@ -97,10 +139,12 @@ export default function App() {
       },
       footer: {
         tagline: "نفتح لك آفاق جديدة",
-        videoTitle: "شاهد قصة نجاحنا",
+        videoTitle: "لننطلق سوياً نحو هدفك ..",
         contact: "تواصل معنا",
         location: "الرياض، السعودية",
-        copyright: "جميع الحقوق محفوظة"
+        copyright: "جميع الحقوق محفوظة",
+        callUs: "اتصل بنا",
+        whatsapp: "واتساب"
       }
     },
     en: {
@@ -125,42 +169,15 @@ export default function App() {
       services: {
         title: "Our Services",
         items: [
-          {
-            title: "Programming",
-            description: "Mobile and web application development using cutting-edge global technologies",
-            icon: Code,
-            videoUrl: "videos/coding.webm"
-          },
-          {
-            title: "Automation",
-            description: "Smart automation solutions that improve business efficiency and save time",
-            icon: Zap,
-            videoUrl: "videos/coding.webm"
-          },
-          {
-            title: "Design",
-            description: "Creative modern designs combining beauty with functionality",
-            icon: Palette,
-            videoUrl: "videos/coding.webm"
-          },
-          {
-            title: "Make Videos",
-            description: "Professional ad campaigns with guaranteed ROI",
-            icon: TrendingUp,
-            videoUrl: "videos/camera.webm"
-          },
-          {
-            title: "Digital Marketing",
-            description: "Comprehensive marketing strategies to boost your digital presence",
-            icon: Globe,
-            videoUrl: "videos/coding.webm"
-          },
-          {
-            title: "Data Analysis",
-            description: "Advanced analytics to help you make data-driven decisions",
-            icon: BarChart3,
-            videoUrl: "videos/coding.webm"
-          }
+          { title: "Programming", description: "Mobile and web application development using cutting-edge global technologies", icon: Code, videoUrl: "videos/coding.webm" },
+          { title: "Automation", description: "Smart automation solutions that improve business efficiency and save time", icon: Zap, videoUrl: "videos/automation.webm" },
+          { title: "Design", description: "Creative modern designs combining beauty with functionality", icon: Palette, videoUrl: "videos/design.webm" },
+          { title: "Video Production", description: "Professional ad campaigns with guaranteed ROI", icon: Camera, videoUrl: "videos/camera.webm" },
+          { title: "Digital Marketing", description: "Comprehensive marketing strategies to boost your digital presence", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
+          { title: "Data Analysis", description: "Advanced analytics to help you make data-driven decisions", icon: BarChart3, videoUrl: "videos/data.webm" },
+          { title: "Field Tracking", description: "Smart tracking systems for real-time monitoring of your field team and improving operational efficiency", icon: MapPin, videoUrl: "videos/location.webm" },
+          { title: "Visual Identity", description: "Comprehensive brand identity design that reflects your brand values and sets you apart in the market", icon: Brush, videoUrl: "videos/logo.webm" },
+          { title: "AI Chatbots", description: "Smart bots that work around the clock to respond to your customers and enhance their experience automatically", icon: Bot, videoUrl: "videos/pot.webm" }
         ]
       },
       cta: {
@@ -173,13 +190,27 @@ export default function App() {
         videoTitle: "Watch Our Success Story",
         contact: "Contact Us",
         location: "Riyadh, Saudi Arabia",
-        copyright: "All Rights Reserved"
+        copyright: "All Rights Reserved",
+        callUs: "Call Us",
+        whatsapp: "WhatsApp"
       }
     }
   };
 
   const t = content[lang];
   const isRTL = lang === 'ar';
+
+  const colors = [
+    { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
+    { bg: 'bg-[#F48120]/20', text: 'text-[#F48120]', gradient: 'from-[#F48120]/20' },
+    { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
+    { bg: 'bg-[#F48120]/20', text: 'text-[#F48120]', gradient: 'from-[#F48120]/20' },
+    { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
+    { bg: 'bg-[#F48120]/20', text: 'text-[#F48120]', gradient: 'from-[#F48120]/20' },
+    { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
+    { bg: 'bg-[#F48120]/20', text: 'text-[#F48120]', gradient: 'from-[#F48120]/20' },
+    { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
+  ];
 
   return (
     <div
@@ -204,7 +235,6 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
             className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden shadow-2xl"
           >
-            {/* Close Button */}
             <motion.button
               whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
@@ -215,33 +245,37 @@ export default function App() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </motion.button>
-
-            {/* Video Player */}
-            <video
-              src={currentVideo}
-              controls
-              autoPlay
-              className="w-full h-full object-cover"
-            />
+            <video src={currentVideo} controls autoPlay className="w-full h-full object-cover" />
           </motion.div>
         </motion.div>
       )}
 
+      {/* Floating WhatsApp Button */}
+      <motion.a
+        href={WHATSAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{
+          opacity: showFloatingWA ? 1 : 0,
+          scale: showFloatingWA ? 1 : 0,
+          pointerEvents: showFloatingWA ? 'auto' : 'none'
+        }}
+        transition={{ duration: 0.3 }}
+        whileHover={{ scale: 1.1, boxShadow: "0 0 30px rgba(37, 211, 102, 0.5)" }}
+        whileTap={{ scale: 0.95 }}
+        className="fixed bottom-6 left-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-xl shadow-[#25D366]/40"
+        style={{ zIndex: 90 }}
+      >
+        <WhatsAppIcon className="w-7 h-7 text-white" />
+      </motion.a>
+
       {/* Mesh Gradient Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full opacity-30">
-          <motion.div
-            style={{ y: parallaxY }}
-            className={`absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full ${isDark ? 'bg-[#1E5FA0]/30' : 'bg-[#1E5FA0]/20'} blur-[120px]`}
-          />
-          <motion.div
-            style={{ y: parallaxY }}
-            className={`absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full ${isDark ? 'bg-[#F48120]/20' : 'bg-[#F48120]/15'} blur-[120px]`}
-          />
-          <motion.div
-            style={{ y: parallaxY }}
-            className={`absolute bottom-[10%] left-[30%] w-[400px] h-[400px] rounded-full ${isDark ? 'bg-[#1E5FA0]/20' : 'bg-[#1E5FA0]/15'} blur-[100px]`}
-          />
+          <motion.div style={{ y: parallaxY }} className={`absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full ${isDark ? 'bg-[#1E5FA0]/30' : 'bg-[#1E5FA0]/20'} blur-[120px]`} />
+          <motion.div style={{ y: parallaxY }} className={`absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full ${isDark ? 'bg-[#F48120]/20' : 'bg-[#F48120]/15'} blur-[120px]`} />
+          <motion.div style={{ y: parallaxY }} className={`absolute bottom-[10%] left-[30%] w-[400px] h-[400px] rounded-full ${isDark ? 'bg-[#1E5FA0]/20' : 'bg-[#1E5FA0]/15'} blur-[100px]`} />
         </div>
       </div>
 
@@ -252,70 +286,37 @@ export default function App() {
         transition={{ duration: 0.6, delay: 0.2 }}
         className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl"
       >
-        <div className={`backdrop-blur-2xl ${isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} border rounded-full px-6 md:px-8 py-4 flex items-center justify-between shadow-2xl`}>
-          <motion.img
-            whileHover={{ scale: 1.05 }}
-            src={logoImg}
-            alt="Afaq"
-            className="h-10 md:h-12 w-auto object-contain rounded-2xl"
-          />
+        <div className={`backdrop-blur-2xl ${isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} border rounded-full px-4 md:px-8 py-3 flex items-center justify-between shadow-2xl`}>
+          <motion.img whileHover={{ scale: 1.05 }} src={logoImg} alt="Afaq" className="h-9 md:h-11 w-auto object-contain rounded-xl" />
 
-          <div className="hidden md:flex items-center gap-8">
-            <motion.a
-              href="#home"
-              whileHover={{ scale: 1.05 }}
-              className={`relative text-sm font-medium transition-colors group px-3 py-1.5 rounded-full`}
-            >
-              <motion.span
-                className={`absolute inset-0 rounded-full ${isDark ? 'bg-white/10' : 'bg-black/10'} opacity-0 group-hover:opacity-100 transition-opacity`}
-              />
-              <span className={`relative z-10 ${isDark ? 'group-hover:text-[#1E5FA0]' : 'group-hover:text-[#1E5FA0]'}`}>
-                {t.nav.home}
-              </span>
-            </motion.a>
-            <motion.a
-              href="#services"
-              whileHover={{ scale: 1.05 }}
-              className={`relative text-sm font-medium transition-colors group px-3 py-1.5 rounded-full`}
-            >
-              <motion.span
-                className={`absolute inset-0 rounded-full ${isDark ? 'bg-white/10' : 'bg-black/10'} opacity-0 group-hover:opacity-100 transition-opacity`}
-              />
-              <span className={`relative z-10 ${isDark ? 'group-hover:text-[#1E5FA0]' : 'group-hover:text-[#1E5FA0]'}`}>
-                {t.nav.services}
-              </span>
-            </motion.a>
-            <motion.a
-              href="#contact"
-              whileHover={{ scale: 1.05 }}
-              className={`relative text-sm font-medium transition-colors group px-3 py-1.5 rounded-full`}
-            >
-              <motion.span
-                className={`absolute inset-0 rounded-full ${isDark ? 'bg-white/10' : 'bg-black/10'} opacity-0 group-hover:opacity-100 transition-opacity`}
-              />
-              <span className={`relative z-10 ${isDark ? 'group-hover:text-[#1E5FA0]' : 'group-hover:text-[#1E5FA0]'}`}>
-                {t.nav.contact}
-              </span>
-            </motion.a>
+          <div className="hidden md:flex items-center gap-6">
+            {[
+              { href: '#home', label: t.nav.home },
+              { href: '#services', label: t.nav.services },
+              { href: '#contact-actions', label: t.nav.contact },
+            ].map(({ href, label }) => (
+              <motion.a key={href} href={href} whileHover={{ scale: 1.05 }} className="relative text-sm font-medium transition-colors group px-3 py-1.5 rounded-full">
+                <motion.span className={`absolute inset-0 rounded-full ${isDark ? 'bg-white/10' : 'bg-black/10'} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                <span className="relative z-10 group-hover:text-[#1E5FA0] transition-colors">{label}</span>
+              </motion.a>
+            ))}
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Theme Toggle */}
+          <div className="flex items-center gap-2">
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full ${isDark ? 'bg-white/5 hover:bg-white/10 border-white/10' : 'bg-black/5 hover:bg-black/10 border-black/10'} border transition-all`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-full ${isDark ? 'bg-white/5 hover:bg-white/10 border-white/10' : 'bg-black/5 hover:bg-black/10 border-black/10'} border transition-all`}
+              aria-label="Toggle theme"
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </motion.button>
 
-            {/* Language Toggle */}
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full ${isDark ? 'bg-white/5 hover:bg-white/10 border-white/10' : 'bg-black/5 hover:bg-black/10 border-black/10'} border transition-all`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-full ${isDark ? 'bg-white/5 hover:bg-white/10 border-white/10' : 'bg-black/5 hover:bg-black/10 border-black/10'} border transition-all`}
+              aria-label="Toggle language"
             >
               <Languages className="w-4 h-4" />
               <span className="text-xs font-semibold">{lang === 'ar' ? 'EN' : 'عربي'}</span>
@@ -329,29 +330,19 @@ export default function App() {
         <div className="max-w-7xl mx-auto w-full">
           <div className="text-center space-y-8 mb-16">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#1E5FA0]/20 to-[#F48120]/20 border ${isDark ? 'border-white/10' : 'border-black/10'}`}
             >
-              <Sparkles className="w-4 h-4 text-[#F48120]" />
               <span className="text-sm font-semibold">{t.hero.badge}</span>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="space-y-4"
-            >
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="space-y-4">
               <h1 className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-[1.1] tracking-tight">
                 {t.hero.title}
               </h1>
               <motion.h2
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="text-4xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-[#1E5FA0] via-[#F48120] to-[#1E5FA0] bg-clip-text text-transparent"
+                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.6 }}
+                className="text-4xl md:text-6xl lg:text-7xl font-black bg-gradient-to-r from-[#1E5FA0] via-[#F48120] to-[#1E5FA0] bg-clip-text pb-4 text-transparent"
                 style={{ backgroundSize: '200% auto' }}
               >
                 {t.hero.highlight}
@@ -359,32 +350,55 @@ export default function App() {
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.8 }}
               className={`text-xl md:text-2xl ${isDark ? 'text-white/60' : 'text-gray-600'} max-w-3xl mx-auto`}
             >
               {t.hero.description}
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1 }}
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 1 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
-              <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 0 50px rgba(244, 129, 32, 0.5)" }}
-                whileTap={{ scale: 0.95 }}
-                className="group px-10 py-5 bg-gradient-to-r from-[#F48120] to-[#F48120]/80 text-white rounded-full font-bold text-lg flex items-center gap-3 shadow-xl shadow-[#F48120]/30"
-              >
-                <span>{t.hero.cta}</span>
-                <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </motion.button>
+              {/* CTA Button with WhatsApp + Phone icons embedded */}
+              <div className="flex items-center gap-2">
+                <motion.a
+                  href="#contact-actions"
+                  whileHover={{ scale: 1.05, boxShadow: "0 0 50px rgba(244, 129, 32, 0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group px-10 py-5 bg-gradient-to-r from-[#F48120] to-[#F48120]/80 text-white rounded-full font-bold text-lg flex items-center gap-3 shadow-xl shadow-[#F48120]/30 cursor-pointer"
+                >
+                  <span>{t.cta.button}</span>
+                  <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </motion.a>
+
+                {/* WhatsApp Icon Button */}
+                <motion.a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.1, boxShadow: "0 0 20px rgba(37, 211, 102, 0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/30 transition-all"
+                  title={t.footer.whatsapp}
+                >
+                  <WhatsAppIcon className="w-6 h-6 text-white" />
+                </motion.a>
+
+                {/* Phone Icon Button */}
+                <motion.a
+                  href={PHONE_URL}
+                  whileHover={{ scale: 1.1, boxShadow: "0 0 20px rgba(30, 95, 160, 0.5)" }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-14 h-14 bg-[#1E5FA0] rounded-full flex items-center justify-center shadow-lg shadow-[#1E5FA0]/30 transition-all"
+                  title={t.footer.callUs}
+                >
+                  <Phone className="w-6 h-6 text-white" />
+                </motion.a>
+              </div>
 
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 onClick={() => openVideoModal('videos/hero-intro.mp4')}
                 className={`px-10 py-5 ${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-black/5 border-black/10 hover:bg-black/10'} backdrop-blur-xl border rounded-full font-bold text-lg flex items-center gap-3 transition-all`}
               >
@@ -395,80 +409,58 @@ export default function App() {
 
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.5 }}
               className="grid grid-cols-3 gap-8 pt-16 max-w-3xl mx-auto"
             >
               {t.stats.map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-3xl md:text-5xl font-black bg-gradient-to-r from-[#1E5FA0] to-[#F48120] bg-clip-text text-transparent">
-                    {stat.number}
-                  </div>
-                  <div className={`text-sm md:text-base ${isDark ? 'text-white/50' : 'text-gray-500'} mt-2`}>{stat.label}</div>
-                </div>
+                <StatCounter key={i} value={stat.number} label={stat.label} isDark={isDark} />
               ))}
             </motion.div>
           </div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 1.5 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2"
         >
           <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }}
             className={`w-6 h-10 border-2 ${isDark ? 'border-white/20' : 'border-black/20'} rounded-full flex items-start justify-center p-2`}
           >
             <motion.div
-              animate={{ opacity: [0, 1, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              animate={{ opacity: [0, 1, 0] }} transition={{ duration: 2, repeat: Infinity }}
               className={`w-1.5 h-1.5 ${isDark ? 'bg-white' : 'bg-black'} rounded-full`}
             />
           </motion.div>
         </motion.div>
       </section>
 
-      {/* Services Grid - All Equal */}
+      {/* Services Grid */}
       <section id="services" className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
           <motion.h3
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
             className="text-4xl md:text-5xl lg:text-6xl font-black mb-16 text-center"
           >
             {t.services.title}
           </motion.h3>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {t.services.items.map((service, i) => {
-              const colors = [
-                { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
-                { bg: 'bg-[#F48120]/20', text: 'text-[#F48120]', gradient: 'from-[#F48120]/20' },
-                { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
-                { bg: 'bg-[#F48120]/20', text: 'text-[#F48120]', gradient: 'from-[#F48120]/20' },
-                { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
-                { bg: 'bg-[#F48120]/20', text: 'text-[#F48120]', gradient: 'from-[#F48120]/20' }
-              ];
-
-              return (
-                <ServiceCard
-                  key={i}
-                  title={service.title}
-                  description={service.description}
-                  videoUrl={service.videoUrl}
-                  icon={service.icon}
-                  color={colors[i]}
-                  index={i}
-                  isDark={isDark}
-                  isRTL={isRTL}
-                />
-              );
-            })}
+            {t.services.items.map((service, i) => (
+              <ServiceCard
+                key={i}
+                title={service.title}
+                description={service.description}
+                videoUrl={service.videoUrl}
+                icon={service.icon}
+                color={colors[i]}
+                index={i}
+                isDark={isDark}
+                isRTL={isRTL}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -476,10 +468,7 @@ export default function App() {
       {/* CTA Section */}
       <section className="py-32 px-6">
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }}
           className="max-w-5xl mx-auto text-center space-y-8"
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight">
@@ -488,14 +477,15 @@ export default function App() {
           <p className={`text-xl md:text-2xl ${isDark ? 'text-white/60' : 'text-gray-600'}`}>
             {t.cta.subtitle}
           </p>
-          <motion.button
+          <motion.a
+            href="#contact-actions"
             whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(244, 129, 32, 0.6)" }}
             whileTap={{ scale: 0.95 }}
-            className="px-12 py-6 bg-gradient-to-r from-[#F48120] to-[#F48120]/80 text-white rounded-full font-bold text-xl shadow-2xl shadow-[#F48120]/40 inline-flex items-center gap-3"
+            className="px-12 py-6 bg-gradient-to-r from-[#F48120] to-[#F48120]/80 text-white rounded-full font-bold text-xl shadow-2xl shadow-[#F48120]/40 inline-flex items-center gap-3 cursor-pointer"
           >
             <span>{t.cta.button}</span>
             <ArrowUpRight className="w-6 h-6" />
-          </motion.button>
+          </motion.a>
         </motion.div>
       </section>
 
@@ -504,13 +494,53 @@ export default function App() {
         <div className={`absolute inset-0 backdrop-blur-3xl ${isDark ? 'bg-white/5' : 'bg-black/5'}`} />
 
         <div className="relative z-10 max-w-7xl mx-auto">
-          {/* Footer Video Section */}
           <FooterVideo
-            videoUrl="videos/hero-desktop.webm"
+            videoUrl="videos/go.webm"
             title={t.footer.videoTitle}
             isDark={isDark}
             isRTL={isRTL}
           />
+
+          {/* Contact Actions — anchor for nav & CTA buttons */}
+          <motion.div
+            ref={contactActionsRef}
+            id="contact-actions"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+          >
+            {/* واتساب */}
+            <motion.a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(37, 211, 102, 0.4)" }}
+              whileTap={{ scale: 0.95 }}
+              className="group flex items-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full font-bold text-lg shadow-xl shadow-[#25D366]/30 transition-all"
+            >
+              <WhatsAppIcon className="w-6 h-6" />
+              <span>{t.footer.whatsapp}</span>
+              <span className={`text-sm font-normal opacity-80 ${isRTL ? 'mr-1' : 'ml-1'}`} dir="ltr">
+                +966 50 476 4145
+              </span>
+            </motion.a>
+
+            {/* اتصال مباشر */}
+            <motion.a
+              href={PHONE_URL}
+              whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(30, 95, 160, 0.4)" }}
+              whileTap={{ scale: 0.95 }}
+              className="group flex items-center gap-3 px-8 py-4 bg-[#1E5FA0] hover:bg-[#1a5090] text-white rounded-full font-bold text-lg shadow-xl shadow-[#1E5FA0]/30 transition-all"
+            >
+              <Phone className="w-5 h-5" />
+              <span>{t.footer.callUs}</span>
+              <span className={`text-sm font-normal opacity-80 ${isRTL ? 'mr-1' : 'ml-1'}`} dir="ltr">
+                +966 50 476 4145
+              </span>
+            </motion.a>
+          </motion.div>
 
           <div className="grid md:grid-cols-3 gap-12 mb-12">
             <div className="space-y-4">
@@ -522,8 +552,8 @@ export default function App() {
               <h4 className="font-bold mb-4">{t.footer.contact}</h4>
               <div className={`space-y-2 ${isDark ? 'text-white/60' : 'text-gray-600'} text-sm`}>
                 <p>{t.footer.location}</p>
-                <p>info@afaq.sa</p>
-                <p>+966 XX XXX XXXX</p>
+                <a href="mailto:info@afaq.sa" className="block hover:text-[#1E5FA0] transition-colors">info@afaq.sa</a>
+                <a href={PHONE_URL} className="block hover:text-[#1E5FA0] transition-colors" dir="ltr">+966 50 476 4145</a>
               </div>
             </div>
 
