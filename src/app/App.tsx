@@ -120,15 +120,15 @@ export default function App() {
       services: {
         title: "مجالاتنا",
         items: [
-          { title: "البرمجة", description: "تطوير تطبيقات الجوال ومواقع الويب باستخدام أحدث التقنيات العالمية", icon: Code, videoUrl: "videos/coding.webm" },
-          { title: "الأتمتة", description: "حلول أتمتة ذكية تحسن كفاءة الأعمال وتوفر الوقت والجهد", icon: Zap, videoUrl: "videos/automation.webm" },
-          { title: "التصميمات", description: "تصاميم إبداعية وعصرية تجمع بين الجمال والوظيفة", icon: Palette, videoUrl: "videos/design.webm" },
-          { title: "صناعة الفيديوهات", description: "حملات إعلانية احترافية بعائد استثمار مضمون", icon: Camera, videoUrl: "videos/camera.webm" },
-          { title: "التسويق الرقمي", description: "استراتيجيات تسويقية شاملة لتعزيز حضورك الرقمي", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
-          { title: "تحليل البيانات", description: "تحليلات متقدمة تساعدك على اتخاذ قرارات مبنية على البيانات", icon: BarChart3, videoUrl: "videos/data.webm" },
-          { title: "تتبع المناديب", description: "أنظمة تتبع ذكية تتيح لك مراقبة فريقك الميداني في الوقت الفعلي وتحسين الكفاءة التشغيلية", icon: MapPin, videoUrl: "videos/location.webm" },
-          { title: "الهوية البصرية", description: "تصميم هوية بصرية متكاملة تعكس قيم علامتك التجارية وتميزها في السوق", icon: Brush, videoUrl: "videos/logo.webm" },
-          { title: "بوتات الرد الآلي", description: "بوتات ذكية تعمل على مدار الساعة للرد على عملائك وتحسين تجربتهم بشكل تلقائي", icon: Bot, videoUrl: "videos/pot.webm" },
+          { title: "هندسة برمجية بمعايير عالمية", description: "نبني تطبيقات ومواقع فائقة السرعة بأحدث التقنيات، لنمنح مشروعك بنية تحتية رقمية قوية تتوسع معك بلا حدود.", icon: Code, videoUrl: "videos/coding.webm" },
+          { title: "أتمتة ذكية تضاعف إنتاجيتك", description: "نستبدل المهام المتكررة بأنظمة ذكية تعمل بالنيابة عنك، لتقليل الأخطاء البشرية وتوفير وقتك للإنجازات التي تهمك فعلاً.", icon: Zap, videoUrl: "videos/automation.webm" },
+          { title: "تصاميم ملهمة تدمج الجمال بالوظيفة", description: "نمزج بين الفن الرقمي وسهولة الاستخدام لنخلق واجهات بصرية ساحرة، لا تكتفي بجذب الأنظار بل تحول الزوار إلى عملاء دائمين.", icon: Palette, videoUrl: "videos/design.webm" },
+          { title: "محتوى مرئي يأسر الجمهور ويحقق النتائج", description: "نصنع فيديوهات إعلانية سينمائية مصممة بذكاء تسويقي، لضمان أعلى عائد على استثمارك وتحويل علامتك التجارية إلى قصة تُلهم الملايين.", icon: Camera, videoUrl: "videos/camera.webm" },
+          { title: "استراتيجيات نمو تضمن لك الصدارة", description: "لا نكتفي بإطلاق الحملات، بل نبني لك منظومة تسويقية شاملة تستهدف جمهورك بدقة وتنمّي حصتك السوقية لتعزيز حضورك الرقمي في قلب المنافسة.", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
+          { title: "تحليلات ذكية لرؤية مستقبلية واضحة", description: "نحول أرقامك الضخمة إلى رؤى استراتيجية مفهومة، مما يمنحك القدرة على اتخاذ قرارات دقيقة مبنية على الحقائق، لتقليل المخاطر واقتناص الفرص قبل الجميع.", icon: BarChart3, videoUrl: "videos/data.webm" },
+          { title: "رقابة ذكية لإدارة عملياتك الميدانية بدقة", description: "نمنحك السيطرة الكاملة عبر أنظمة تتبع حية تمكنك من مراقبة فريقك في الوقت الفعلي، لتحسين مسارات التوصيل، تقليل التكاليف التشغيلية، وضمان أعلى مستويات رضا العملاء.", icon: MapPin, videoUrl: "videos/location.webm" },
+          { title: "هوية بصرية تروي قصة نجاحك", description: "لا نصمم مجرد رموز، بل نبني لعلامتك التجارية لغة بصرية متكاملة تعكس قيمك وتترك أثراً ذهنياً لا يُنسى، لتضمن لبراندك الهيبة والتميز في سوق لا يتوقف عن المنافسة.", icon: Brush, videoUrl: "videos/logo.webm" },
+          { title: "ذكاء اصطناعي يمنح عملائك رداً فورياً على مدار الساعة", description: "نطور بوتات محادثة ذكية تفهم احتياجات عملائك وتجيبهم في ثوانٍ، لضمان استمرارية تواصلك وبناء علاقة موثوقة مع جمهورك دون توقف أو انتظار.", icon: Bot, videoUrl: "videos/pot.webm" },
         ],
       },
       cta: { title: "جاهز لبدء مشروعك القادم؟", subtitle: "دعنا نحول رؤيتك إلى واقع رقمي", button: "تواصل معنا الآن" },
@@ -159,15 +159,15 @@ export default function App() {
       services: {
         title: "Our Services",
         items: [
-          { title: "Programming", description: "Mobile and web application development using cutting-edge global technologies", icon: Code, videoUrl: "videos/coding.webm" },
-          { title: "Automation", description: "Smart automation solutions that improve business efficiency and save time", icon: Zap, videoUrl: "videos/automation.webm" },
-          { title: "Design", description: "Creative modern designs combining beauty with functionality", icon: Palette, videoUrl: "videos/design.webm" },
-          { title: "Video Production", description: "Professional ad campaigns with guaranteed ROI", icon: Camera, videoUrl: "videos/camera.webm" },
-          { title: "Digital Marketing", description: "Comprehensive marketing strategies to boost your digital presence", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
-          { title: "Data Analysis", description: "Advanced analytics to help you make data-driven decisions", icon: BarChart3, videoUrl: "videos/data.webm" },
-          { title: "Field Tracking", description: "Smart tracking systems for real-time monitoring of your field team and improving operational efficiency", icon: MapPin, videoUrl: "videos/location.webm" },
-          { title: "Visual Identity", description: "Comprehensive brand identity design that reflects your brand values and sets you apart in the market", icon: Brush, videoUrl: "videos/logo.webm" },
-          { title: "AI Chatbots", description: "Smart bots that work around the clock to respond to your customers and enhance their experience automatically", icon: Bot, videoUrl: "videos/pot.webm" },
+          { title: "Global-Standard Software Engineering", description: "We engineer high-performance applications and websites using world-class technologies, providing your project with a robust and infinitely scalable digital infrastructure.", icon: Code, videoUrl: "videos/coding.webm" },
+          { title: "Intelligent Automation to Scale Productivity", description: "We replace repetitive tasks with smart, autonomous systems that work on your behalf, eliminating human error and reclaiming your time for the goals that truly matter.", icon: Zap, videoUrl: "videos/automation.webm" },
+          { title: "Creative Design & User Experience", description: "We blend digital artistry with seamless functionality to create captivating interfaces that don't just look stunning, but strategically turn visitors into loyal customers.", icon: Palette, videoUrl: "videos/design.webm" },
+          { title: "Visual Production & Impactful Campaigns", description: "We craft cinematic ad content engineered with marketing intelligence to ensure maximum ROI, turning your brand into an inspiring story that resonates with millions.", icon: Camera, videoUrl: "videos/camera.webm" },
+          { title: "Strategic Digital Marketing", description: "We don't just launch campaigns; we build a comprehensive marketing ecosystem that precisely targets your audience and grows your market share to dominate the digital landscape.", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
+          { title: "Data Analytics & Business Intelligence", description:"We transform your raw data into actionable strategic insights, empowering you to make precision-driven decisions based on facts to mitigate risks and seize opportunities ahead of the curve.", icon: BarChart3, videoUrl: "videos/data.webm" },
+          { title: "Smart Fleet & Field Force Tracking", description: "Gain absolute control with real-time tracking systems that allow you to monitor your field team instantly, optimizing delivery routes, reducing operational costs, and ensuring peak customer satisfaction.", icon: MapPin, videoUrl: "videos/location.webm" },
+          { title: "Visual Identity & Aesthetic Strategy", description: "We don’t just design logos; we build a comprehensive visual language that reflects your core values and leaves an unforgettable impression, ensuring your brand commands authority and stands out in a crowded market.", icon: Brush, videoUrl: "videos/logo.webm" },
+          { title: "AI Chatbots & Automated Customer Engagement", description: "We develop intelligent chatbots that understand your customers' needs and respond instantly, ensuring 24/7 engagement and building reliable relationships without downtime or delays.", icon: Bot, videoUrl: "videos/pot.webm" },
         ],
       },
       cta: { title: "Ready to Start Your Next Project?", subtitle: "Let's transform your vision into digital reality", button: "Contact Us Now" },
@@ -345,12 +345,53 @@ export default function App() {
             </motion.div>
 
             {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.8 }}
-              className={`text-xl md:text-2xl ${isDark ? 'text-white/60' : 'text-gray-600'} max-w-3xl mx-auto`}
-            >
-              {t.hero.description}
-            </motion.p>
+            <motion.div
+  initial={{ opacity: 0, y: 30 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8, delay: 0.8 }}
+  className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-6xl mx-auto px-4"
+>
+  {[
+    {
+      title: "هويّة بصرية تصنع الفارق",
+      desc: "نصمم لك براند احترافي يرسخ في ذهن عملائك ويمنحك التميز الذي تستحقه.",
+      icon: "🎨"
+    },
+    {
+      title: "حلول تقنية تريح بالك",
+      desc: "نحول تعقيدات البرمجة إلى أدوات سهلة تزيد من كفاءة وإيرادات مشروعك.",
+      icon: "⚡"
+    },
+    {
+      title: "شريك تقني تعتمد عليه",
+      desc: "لسنا مجرد شركة تنفيذ، نحن فريقك التقني الذي يدعم نموّك خطوة بخطوة.",
+      icon: "🤝"
+    }
+  ].map((item, index) => (
+    <div
+      key={index}
+      className={`relative group p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-2 
+        ${isDark 
+          ? 'bg-white/5 border-white/10 backdrop-blur-md hover:bg-white/10' 
+          : 'bg-black/5 border-black/10 backdrop-blur-md hover:bg-black/10'
+        }`}
+    >
+      {/* أيقونة خفيفة في الخلفية تدي شكل جمالي */}
+      <div className="text-3xl mb-4">{item.icon}</div>
+      
+      <h3 className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+        {item.title}
+      </h3>
+      
+      <p className={`text-sm leading-relaxed ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
+        {item.desc}
+      </p>
+
+      {/* خط توهج سفلي بلون البراند */}
+      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-[#1E5FA0] to-[#F48120] transition-all duration-500 group-hover:w-full rounded-b-2xl" />
+    </div>
+  ))}
+</motion.div>
 
             {/* ===== CTA — زر واحد فقط، بدون "شاهد الفيديو" ===== */}
             <motion.div
