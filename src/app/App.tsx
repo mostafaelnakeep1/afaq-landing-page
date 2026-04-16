@@ -14,8 +14,7 @@ const WHATSAPP_URL = `https://wa.me/${PHONE_NUMBER}`;
 const PHONE_URL = `tel:+${PHONE_NUMBER}`;
 const NAV_OFFSET = 96;
 
-// ── Client logos (1–7) ──────────────────────────────────────────────────────
-const CLIENT_LOGOS = Array.from({ length: 7 }, (_, i) => `imgs/${i + 1}.jpg`);
+
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -36,49 +35,57 @@ function scrollToTop() {
 
 // ── Infinite Marquee ──────────────────────────────────────────────────────
 function ClientsMarquee({ isDark, isRTL }: { isDark: boolean; isRTL: boolean }) {
-  // Duplicate for seamless loop
-  const logos = [...CLIENT_LOGOS, ...CLIENT_LOGOS, ...CLIENT_LOGOS];
-  const direction = isRTL ? 1 : -1; // RTL: left→right; LTR: right→left
+  const baseLogos = ["/imgs/1.jpg", "/imgs/2.jpg", "/imgs/3.jpg", "/imgs/4.jpg", "/imgs/5.jpg", "/imgs/6.jpg", "/imgs/7.jpg"];
+  
+  // تكرار المصفوفة 4 مرات (7 * 4 = 28 صورة) لضمان شريط طويل جداً
+  const logos = [...baseLogos, ...baseLogos, ...baseLogos, ...baseLogos];
+  const direction = isRTL ? 1 : -1;
 
   return (
-    <div className="relative w-full overflow-hidden py-4">
-      {/* Fade edges */}
-      <div className={`absolute inset-y-0 left-0 w-32 z-10 pointer-events-none bg-gradient-to-r ${isDark ? 'from-[#050505]' : 'from-white'} to-transparent`} />
-      <div className={`absolute inset-y-0 right-0 w-32 z-10 pointer-events-none bg-gradient-to-l ${isDark ? 'from-[#050505]' : 'from-white'} to-transparent`} />
+    <div className="relative w-full overflow-hidden py-16">
+      {/* الشريط الزجاجي (Glassmorphism) */}
+      <div className={`absolute inset-y-4 inset-x-0 z-0 border-y backdrop-blur-xl
+        ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-black/[0.03] border-black/10'} 
+      `}></div>
 
-      <motion.div
-        className="flex items-center gap-10"
-        animate={{ x: direction === -1 ? [0, -100 * CLIENT_LOGOS.length * 0.6 + '%'] : ['0%', `${100 * CLIENT_LOGOS.length * 0.6}%`] }}
-        style={{ width: 'max-content' }}
-        transition={{
-          x: {
+      {/* التظليل الجانبي (لإخفاء الدخول والخروج) */}
+      <div className={`absolute inset-y-0 left-0 w-48 z-30 pointer-events-none bg-gradient-to-r ${isDark ? 'from-[#050505]' : 'from-white'} to-transparent`} />
+      <div className={`absolute inset-y-0 right-0 w-48 z-30 pointer-events-none bg-gradient-to-l ${isDark ? 'from-[#050505]' : 'from-white'} to-transparent`} />
+
+      <div className="relative flex items-center justify-center h-28">
+        <motion.div
+          className="flex items-center gap-16 px-8"
+          style={{ width: 'max-content' }}
+          animate={{ 
+            // التحريك بمقدار بكسلات ثابتة (مثلاً عرض 7 صور + المسافات بينهم)
+            x: direction === -1 ? [0, -1400] : [-1400, 0] 
+          }}
+          transition={{
+            duration: 25, // سرعة هادئة
             repeat: Infinity,
-            repeatType: 'loop',
-            duration: 28,
-            ease: 'linear',
-          },
-        }}
-      >
-        {logos.map((src, i) => (
-          <div
-            key={i}
-            className={`flex-shrink-0 w-28 h-16 rounded-2xl overflow-hidden flex items-center justify-center
-              ${isDark ? 'bg-white/8 border border-white/10' : 'bg-black/5 border border-black/10'}
-              hover:scale-105 transition-transform duration-300`}
-          >
-            <img
-              src={src}
-              alt={`client-${(i % CLIENT_LOGOS.length) + 1}`}
-              className="w-full h-full object-contain p-2"
-              loading="lazy"
-            />
-          </div>
-        ))}
-      </motion.div>
+            ease: "linear",
+            repeatType: "loop"
+          }}
+        >
+          {logos.map((src, i) => (
+            <div 
+              key={i} 
+              className="flex-shrink-0 flex items-center justify-center w-32 h-20" // مساحة ثابتة للوجو
+            >
+              <img
+                src={src}
+                alt="client"
+                className={`max-h-full max-w-full object-contain rounded-xl transition-all duration-500
+                  ${isDark ? 'opacity-60 hover:opacity-100 brightness-110' : 'grayscale opacity-60 hover:grayscale-0 hover:opacity-100'}
+                  hover:scale-110`}
+              />
+            </div>
+          ))}
+        </motion.div>
+      </div>
     </div>
   );
 }
-
 // ── Testimonial Card ──────────────────────────────────────────────────────
 function TestimonialCard({ name, role, text, rating, isDark, delay }: {
   name: string; role: string; text: string; rating: number; isDark: boolean; delay: number;
@@ -777,20 +784,25 @@ export default function App() {
       {/* ══════════════════════════════════════════════════════════════
           CLIENTS MARQUEE
       ══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 bg-gradient-to-r from-[#1E5FA0]/20 to-[#F48120]/20 border ${isDark ? 'border-white/10' : 'border-black/10'}`}>
-              <span className="text-sm font-semibold">{t.clients.subtitle}</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black">{t.clients.title}</h2>
-          </motion.div>
-          <ClientsMarquee isDark={isDark} isRTL={isRTL} />
-        </div>
-      </section>
+      <section className="py-20 overflow-hidden"> {/* أضفنا overflow-hidden لمنع ظهور الشريط الجانبي */}
+  <div className="max-w-7xl mx-auto px-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }} 
+      whileInView={{ opacity: 1, y: 0 }} 
+      viewport={{ once: true }} 
+      transition={{ duration: 0.6 }}
+      className="text-center mb-16"
+    >
+      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 bg-gradient-to-r from-[#1E5FA0]/20 to-[#F48120]/20 border ${isDark ? 'border-white/10' : 'border-black/10'}`}>
+        <span className="text-sm font-semibold">{t.clients.subtitle}</span>
+      </div>
+      <h2 className="text-4xl md:text-5xl font-black">{t.clients.title}</h2>
+    </motion.div>
+  </div>
+
+  {/* شريط اللوجوهات المنساب */}
+  <ClientsMarquee isDark={isDark} isRTL={isRTL} />
+</section>
 
       {/* ══════════════════════════════════════════════════════════════
           CTA SECTION
