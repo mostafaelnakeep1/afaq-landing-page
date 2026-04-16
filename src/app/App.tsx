@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform, useInView } from "motion/react";
-import { Code, Palette, TrendingUp, Languages, ArrowUpRight, Zap, BarChart3, Sun, Moon, MapPin, Brush, Bot, Camera, Phone } from "lucide-react";
+import { Code, Palette, TrendingUp, Languages, ArrowUpRight, ArrowUp, Zap, BarChart3, Sun, Moon, MapPin, Brush, Bot, Camera, Phone } from "lucide-react";
 import logoLight from "../../public/imgs/seedream.jpg";
 import logoDark from "../../public/imgs/logo.jpeg";
 import { ServiceCard } from "./components/ServiceCard";
@@ -12,8 +12,6 @@ type Theme = 'dark' | 'light';
 const PHONE_NUMBER = "966504764145";
 const WHATSAPP_URL = `https://wa.me/${PHONE_NUMBER}`;
 const PHONE_URL = `tel:+${PHONE_NUMBER}`;
-
-// ارتفاع الناف بار الثابت + المسافة من الأعلى (top-6=24px + ~64px ارتفاع الناف بار)
 const NAV_OFFSET = 96;
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -22,12 +20,15 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-// Smooth scroll مع تعويض الناف بار
-function scrollTo(id: string) {
+function scrollToId(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
   const y = el.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
   window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 export default function App() {
@@ -36,6 +37,7 @@ export default function App() {
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [currentVideo, setCurrentVideo] = useState<string>('');
   const [showFloatingWA, setShowFloatingWA] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const contactActionsRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
@@ -44,19 +46,13 @@ export default function App() {
   const isDark = theme === 'dark';
   const logoImg = isDark ? logoDark : logoLight;
 
-  // ===== تغيير عنوان وأيقونة التاب =====
   useEffect(() => {
     document.title = 'Afaq';
     let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement | null;
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'icon';
-      document.head.appendChild(link);
-    }
+    if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
     link.href = logoImg;
   }, [logoImg]);
 
-  // ===== إخفاء الفلوتينج واتساب عند الوصول لـ contact-actions =====
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setShowFloatingWA(!entry.isIntersecting),
@@ -66,9 +62,14 @@ export default function App() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const closeVideoModal = () => { setVideoModalOpen(false); setCurrentVideo(''); };
 
-  // ===== StatCounter =====
   const StatCounter = ({ value, label, isDark }: { value: string; label: string; isDark: boolean }) => {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -76,21 +77,18 @@ export default function App() {
     const suffix = value.replace(/[0-9]/g, "");
     const [displayValue, setDisplayValue] = useState(0);
     const [animating, setAnimating] = useState(false);
-
     useEffect(() => {
       if (isInView && !animating) {
         setAnimating(true);
         let step = 0;
-        const total = 100;
         const timer = setInterval(() => {
           step++;
           setDisplayValue(Math.floor(Math.random() * finalNumber * 1.5));
-          if (step >= total) { clearInterval(timer); setDisplayValue(finalNumber); }
+          if (step >= 100) { clearInterval(timer); setDisplayValue(finalNumber); }
         }, 10);
         return () => clearInterval(timer);
       }
     }, [isInView, finalNumber]);
-
     return (
       <div ref={ref} className="text-center">
         <div className="text-3xl md:text-5xl font-black bg-gradient-to-r from-[#1E5FA0] to-[#F48120] bg-clip-text text-transparent flex justify-center">
@@ -101,17 +99,23 @@ export default function App() {
     );
   };
 
-  // ===== Content =====
+  const featureCards = {
+    ar: [
+      { title: "هويّة بصرية تصنع الفارق", desc: "نصمم لك براند احترافي يرسخ في ذهن عملائك ويمنحك التميز الذي تستحقه.", icon: "🎨" },
+      { title: "حلول تقنية تريح بالك", desc: "نحول تعقيدات البرمجة إلى أدوات سهلة تزيد من كفاءة وإيرادات مشروعك.", icon: "⚡" },
+      { title: "شريك تقني تعتمد عليه", desc: "لسنا مجرد شركة تنفيذ، نحن فريقك التقني الذي يدعم نموّك خطوة بخطوة.", icon: "🤝" },
+    ],
+    en: [
+      { title: "Visual Identity That Makes a Difference", desc: "We craft a professional brand that sticks in your customers' minds and gives you the distinction you deserve.", icon: "🎨" },
+      { title: "Tech Solutions That Give You Peace of Mind", desc: "We turn complex code into simple tools that boost your project's efficiency and revenue.", icon: "⚡" },
+      { title: "A Tech Partner You Can Rely On", desc: "We're not just an agency — we're your dedicated tech team, supporting your growth every step of the way.", icon: "🤝" },
+    ],
+  };
+
   const content = {
     ar: {
       nav: { home: "الرئيسية", services: "خدماتنا", contact: "تواصل" },
-      hero: {
-        badge: "وكالة تقنية رائدة",
-        title: "نفتح لك آفاق جديدة",
-        highlight: "في عالم التقنية",
-        description: "نحول أفكارك إلى منتجات رقمية استثنائية",
-        cta: "تواصل معنا الآن",
-      },
+      hero: { badge: "وكالة تقنية رائدة", title: "نفتح لك آفاق جديدة", highlight: "في عالم التقنية", cta: "تواصل معنا الآن" },
       stats: [
         { number: "200+", label: "مشروع منجز" },
         { number: "95%", label: "رضا العملاء" },
@@ -136,21 +140,16 @@ export default function App() {
         tagline: "نفتح لك آفاق جديدة",
         videoTitle: "لننطلق سوياً نحو هدفك ..",
         contact: "تواصل معنا",
-        location: "الرياض، السعودية",
+        location: "الرياض، المملكة العربية السعودية",
         copyright: "جميع الحقوق محفوظة",
         callUs: "اتصل بنا",
         whatsapp: "واتساب",
+        contactNow: "تواصل معنا الآن",
       },
     },
     en: {
       nav: { home: "Home", services: "Services", contact: "Contact" },
-      hero: {
-        badge: "Leading Tech Agency",
-        title: "Opening New Horizons",
-        highlight: "In Technology",
-        description: "Transforming ideas into exceptional digital products",
-        cta: "Contact Us Now",
-      },
+      hero: { badge: "Leading Tech Agency", title: "Opening New Horizons", highlight: "In Technology", cta: "Contact Us Now" },
       stats: [
         { number: "200+", label: "Projects Done" },
         { number: "95%", label: "Client Satisfaction" },
@@ -161,12 +160,12 @@ export default function App() {
         items: [
           { title: "Global-Standard Software Engineering", description: "We engineer high-performance applications and websites using world-class technologies, providing your project with a robust and infinitely scalable digital infrastructure.", icon: Code, videoUrl: "videos/coding.webm" },
           { title: "Intelligent Automation to Scale Productivity", description: "We replace repetitive tasks with smart, autonomous systems that work on your behalf, eliminating human error and reclaiming your time for the goals that truly matter.", icon: Zap, videoUrl: "videos/automation.webm" },
-          { title: "Creative Design & User Experience", description: "We blend digital artistry with seamless functionality to create captivating interfaces that don't just look stunning, but strategically turn visitors into loyal customers.", icon: Palette, videoUrl: "videos/design.webm" },
+          { title: "Creative Design & Inspiring User Experiences", description: "We blend digital artistry with seamless functionality to create captivating interfaces that don't just look stunning, but strategically turn visitors into loyal customers.", icon: Palette, videoUrl: "videos/design.webm" },
           { title: "Visual Production & Impactful Campaigns", description: "We craft cinematic ad content engineered with marketing intelligence to ensure maximum ROI, turning your brand into an inspiring story that resonates with millions.", icon: Camera, videoUrl: "videos/camera.webm" },
-          { title: "Strategic Digital Marketing", description: "We don't just launch campaigns; we build a comprehensive marketing ecosystem that precisely targets your audience and grows your market share to dominate the digital landscape.", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
-          { title: "Data Analytics & Business Intelligence", description:"We transform your raw data into actionable strategic insights, empowering you to make precision-driven decisions based on facts to mitigate risks and seize opportunities ahead of the curve.", icon: BarChart3, videoUrl: "videos/data.webm" },
+          { title: "Strategic Digital Marketing & Growth", description: "We don't just launch campaigns; we build a comprehensive marketing ecosystem that precisely targets your audience and grows your market share to dominate the digital landscape.", icon: TrendingUp, videoUrl: "videos/marketing.webm" },
+          { title: "Data Analytics & Business Intelligence", description: "We transform your raw data into actionable strategic insights, empowering you to make precision-driven decisions based on facts to mitigate risks and seize opportunities ahead of the curve.", icon: BarChart3, videoUrl: "videos/data.webm" },
           { title: "Smart Fleet & Field Force Tracking", description: "Gain absolute control with real-time tracking systems that allow you to monitor your field team instantly, optimizing delivery routes, reducing operational costs, and ensuring peak customer satisfaction.", icon: MapPin, videoUrl: "videos/location.webm" },
-          { title: "Visual Identity & Aesthetic Strategy", description: "We don’t just design logos; we build a comprehensive visual language that reflects your core values and leaves an unforgettable impression, ensuring your brand commands authority and stands out in a crowded market.", icon: Brush, videoUrl: "videos/logo.webm" },
+          { title: "Visual Identity & Brand Strategy", description: "We don't just design logos; we build a comprehensive visual language that reflects your core values and leaves an unforgettable impression, ensuring your brand commands authority and stands out.", icon: Brush, videoUrl: "videos/logo.webm" },
           { title: "AI Chatbots & Automated Customer Engagement", description: "We develop intelligent chatbots that understand your customers' needs and respond instantly, ensuring 24/7 engagement and building reliable relationships without downtime or delays.", icon: Bot, videoUrl: "videos/pot.webm" },
         ],
       },
@@ -179,12 +178,14 @@ export default function App() {
         copyright: "All Rights Reserved",
         callUs: "Call Us",
         whatsapp: "WhatsApp",
+        contactNow: "Contact Us Now",
       },
     },
   };
 
   const t = content[lang];
   const isRTL = lang === 'ar';
+  const cards = featureCards[lang];
 
   const colors = [
     { bg: 'bg-[#1E5FA0]/20', text: 'text-[#1E5FA0]', gradient: 'from-[#1E5FA0]/20' },
@@ -205,7 +206,6 @@ export default function App() {
       className={`min-h-screen ${isDark ? 'bg-[#050505] text-white' : 'bg-white text-gray-900'} overflow-x-hidden relative transition-colors duration-500`}
       style={{ fontFamily: lang === 'ar' ? 'Cairo, sans-serif' : 'Inter, sans-serif' }}
     >
-      {/* Video Modal */}
       {videoModalOpen && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -231,24 +231,36 @@ export default function App() {
         </motion.div>
       )}
 
-      {/* ===== Floating WhatsApp ===== */}
-      <motion.a
-        href={WHATSAPP_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{
-          opacity: showFloatingWA ? 1 : 0,
-          scale: showFloatingWA ? 1 : 0,
-          pointerEvents: showFloatingWA ? 'auto' : 'none',
-        }}
-        transition={{ duration: 0.3 }}
-        whileHover={{ scale: 1.12 }}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 left-6 z-[90] w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-xl shadow-[#25D366]/40"
-      >
-        <WhatsAppIcon className="w-7 h-7 text-white" />
-      </motion.a>
+      {/* ===== Floating Buttons Stack ===== */}
+      <div className="fixed bottom-6 left-6 z-[90] flex flex-col gap-3 items-center">
+        <motion.a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: showFloatingWA ? 1 : 0, scale: showFloatingWA ? 1 : 0, pointerEvents: showFloatingWA ? 'auto' : 'none' }}
+          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-xl shadow-[#25D366]/40"
+        >
+          <WhatsAppIcon className="w-7 h-7 text-white" />
+        </motion.a>
+
+        <motion.button
+          onClick={scrollToTop}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: showScrollTop ? 1 : 0, scale: showScrollTop ? 1 : 0, pointerEvents: showScrollTop ? 'auto' : 'none' }}
+          transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.95 }}
+          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all
+            ${isDark ? 'bg-white/10 border border-white/20 text-white hover:bg-white/20' : 'bg-black/10 border border-black/10 text-gray-800 hover:bg-black/20'}`}
+          aria-label="Back to top"
+        >
+          <ArrowUp className="w-6 h-6" />
+        </motion.button>
+      </div>
 
       {/* Mesh Gradient */}
       <div className="fixed inset-0 pointer-events-none">
@@ -261,30 +273,21 @@ export default function App() {
 
       {/* ===== Navbar ===== */}
       <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        initial={{ y: -100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.6, delay: 0.2 }}
         className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl"
       >
         <div className={`backdrop-blur-2xl ${isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'} border rounded-full px-4 md:px-8 py-3 flex items-center justify-between shadow-2xl`}>
-          {/* Logo */}
-          <motion.img
-            whileHover={{ scale: 1.05 }}
-            src={logoImg}
-            alt="Afaq"
-            className="h-9 md:h-11 w-auto object-contain rounded-xl flex-shrink-0"
-          />
+          <motion.img whileHover={{ scale: 1.05 }} src={logoImg} alt="Afaq" className="h-9 md:h-11 w-auto object-contain rounded-xl flex-shrink-0" />
 
-          {/* Nav Links — استخدم button مع scrollTo بدل <a> لتفادي القفز تحت الناف بار */}
           <div className="hidden md:flex items-center gap-4 lg:gap-6">
             {[
-              { id: 'home',            label: t.nav.home },
-              { id: 'services',        label: t.nav.services },
-              { id: 'contact-actions', label: t.nav.contact },
+              { id: 'home', label: t.nav.home },
+              { id: 'services', label: t.nav.services },
+              { id: 'footer-contact', label: t.nav.contact },
             ].map(({ id, label }) => (
               <motion.button
                 key={id}
-                onClick={() => scrollTo(id)}
+                onClick={() => scrollToId(id)}
                 whileHover={{ scale: 1.05 }}
                 className="relative text-sm font-medium transition-colors group px-3 py-1.5 rounded-full"
               >
@@ -294,7 +297,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Controls */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <motion.button
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -304,7 +306,6 @@ export default function App() {
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </motion.button>
-
             <motion.button
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
               onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
@@ -322,7 +323,6 @@ export default function App() {
       <section id="home" className="relative min-h-screen flex items-center justify-center px-6 pt-32 pb-20">
         <div className="max-w-7xl mx-auto w-full">
           <div className="text-center space-y-8 mb-16">
-            {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
               className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#1E5FA0]/20 to-[#F48120]/20 border ${isDark ? 'border-white/10' : 'border-black/10'}`}
@@ -330,7 +330,6 @@ export default function App() {
               <span className="text-sm font-semibold">{t.hero.badge}</span>
             </motion.div>
 
-            {/* Titles */}
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="space-y-4">
               <h1 className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-[1.1] tracking-tight">
                 {t.hero.title}
@@ -344,62 +343,32 @@ export default function App() {
               </motion.h2>
             </motion.div>
 
-            {/* Description */}
+            {/* Feature Cards */}
             <motion.div
-  initial={{ opacity: 0, y: 30 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.8, delay: 0.8 }}
-  className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-6xl mx-auto px-4"
->
-  {[
-    {
-      title: "هويّة بصرية تصنع الفارق",
-      desc: "نصمم لك براند احترافي يرسخ في ذهن عملائك ويمنحك التميز الذي تستحقه.",
-      icon: "🎨"
-    },
-    {
-      title: "حلول تقنية تريح بالك",
-      desc: "نحول تعقيدات البرمجة إلى أدوات سهلة تزيد من كفاءة وإيرادات مشروعك.",
-      icon: "⚡"
-    },
-    {
-      title: "شريك تقني تعتمد عليه",
-      desc: "لسنا مجرد شركة تنفيذ، نحن فريقك التقني الذي يدعم نموّك خطوة بخطوة.",
-      icon: "🤝"
-    }
-  ].map((item, index) => (
-    <div
-      key={index}
-      className={`relative group p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-2 
-        ${isDark 
-          ? 'bg-white/5 border-white/10 backdrop-blur-md hover:bg-white/10' 
-          : 'bg-black/5 border-black/10 backdrop-blur-md hover:bg-black/10'
-        }`}
-    >
-      {/* أيقونة خفيفة في الخلفية تدي شكل جمالي */}
-      <div className="text-3xl mb-4">{item.icon}</div>
-      
-      <h3 className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-        {item.title}
-      </h3>
-      
-      <p className={`text-sm leading-relaxed ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
-        {item.desc}
-      </p>
+              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12 max-w-6xl mx-auto px-4"
+            >
+              {cards.map((item, index) => (
+                <div
+                  key={index}
+                  className={`relative group p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-2
+                    ${isDark ? 'bg-white/5 border-white/10 backdrop-blur-md hover:bg-white/10' : 'bg-black/5 border-black/10 backdrop-blur-md hover:bg-black/10'}`}
+                >
+                  <div className="text-3xl mb-4">{item.icon}</div>
+                  <h3 className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>{item.title}</h3>
+                  <p className={`text-sm leading-relaxed ${isDark ? 'text-white/70' : 'text-gray-600'}`}>{item.desc}</p>
+                  <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-[#1E5FA0] to-[#F48120] transition-all duration-500 group-hover:w-full rounded-b-2xl" />
+                </div>
+              ))}
+            </motion.div>
 
-      {/* خط توهج سفلي بلون البراند */}
-      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-[#1E5FA0] to-[#F48120] transition-all duration-500 group-hover:w-full rounded-b-2xl" />
-    </div>
-  ))}
-</motion.div>
-
-            {/* ===== CTA — زر واحد فقط، بدون "شاهد الفيديو" ===== */}
+            {/* CTA button — hero */}
             <motion.div
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 1 }}
               className="flex items-center justify-center pt-4"
             >
               <motion.button
-                onClick={() => scrollTo('contact-actions')}
+                onClick={() => scrollToId('footer-contact')}
                 whileHover={{ scale: 1.05, boxShadow: "0 0 50px rgba(244, 129, 32, 0.5)" }}
                 whileTap={{ scale: 0.95 }}
                 className="group px-10 py-5 bg-gradient-to-r from-[#F48120] to-[#F48120]/80 text-white rounded-full font-bold text-lg flex items-center gap-3 shadow-xl shadow-[#F48120]/30 cursor-pointer"
@@ -421,7 +390,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 1.5 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2"
@@ -473,15 +441,48 @@ export default function App() {
         >
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight">{t.cta.title}</h2>
           <p className={`text-xl md:text-2xl ${isDark ? 'text-white/60' : 'text-gray-600'}`}>{t.cta.subtitle}</p>
-          <motion.button
-            onClick={() => scrollTo('contact-actions')}
-            whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(244, 129, 32, 0.6)" }}
-            whileTap={{ scale: 0.95 }}
-            className="px-12 py-6 bg-gradient-to-r from-[#F48120] to-[#F48120]/80 text-white rounded-full font-bold text-xl shadow-2xl shadow-[#F48120]/40 inline-flex items-center gap-3 cursor-pointer"
+          {/* ===== Contact Actions ===== */}
+          <motion.div
+            ref={contactActionsRef}
+            id="footer-contact"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="flex items-center justify-center mb-16"
           >
-            <span>{t.cta.button}</span>
-            <ArrowUpRight className="w-6 h-6" />
-          </motion.button>
+            {/* Label + two icon-only buttons */}
+            <div className={`flex items-center gap-4 px-8 py-4 rounded-full
+              ${isDark
+                ? 'bg-gradient-to-r from-[#1E5FA0]/20 to-[#F48120]/20 border border-white/10'
+                : 'bg-gradient-to-r from-[#1E5FA0]/10 to-[#F48120]/10 border border-black/10'
+              }`}
+            >
+              <span className="font-bold text-xl">{t.footer.contactNow}</span>
+
+              <motion.a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.15, boxShadow: "0 0 20px rgba(37,211,102,0.5)" }}
+                whileTap={{ scale: 0.95 }}
+                className="w-12 h-12 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg shadow-[#25D366]/30 flex-shrink-0"
+                title={t.footer.whatsapp}
+              >
+                <WhatsAppIcon className="w-6 h-6 text-white" />
+              </motion.a>
+
+              <motion.a
+                href={PHONE_URL}
+                whileHover={{ scale: 1.15, boxShadow: "0 0 20px rgba(30,95,160,0.5)" }}
+                whileTap={{ scale: 0.95 }}
+                className="w-12 h-12 bg-[#1E5FA0] rounded-full flex items-center justify-center shadow-lg shadow-[#1E5FA0]/30 flex-shrink-0"
+                title={t.footer.callUs}
+              >
+                <Phone className="w-5 h-5 text-white" />
+              </motion.a>
+            </div>
+          </motion.div>
         </motion.div>
       </section>
 
@@ -492,40 +493,7 @@ export default function App() {
         <div className="relative z-10 max-w-7xl mx-auto">
           <FooterVideo videoUrl="videos/go.webm" title={t.footer.videoTitle} isDark={isDark} isRTL={isRTL} />
 
-          {/* ===== Contact Actions ===== */}
-          <motion.div
-            ref={contactActionsRef}
-            id="contact-actions"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
-          >
-            <motion.a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(37, 211, 102, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-3 px-8 py-4 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full font-bold text-lg shadow-xl shadow-[#25D366]/30 transition-all"
-            >
-              <WhatsAppIcon className="w-6 h-6" />
-              <span>{t.footer.whatsapp}</span>
-              <span className={`text-sm font-normal opacity-80 ${isRTL ? 'mr-1' : 'ml-1'}`} dir="ltr">+966 50 476 4145</span>
-            </motion.a>
-
-            <motion.a
-              href={PHONE_URL}
-              whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(30, 95, 160, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-3 px-8 py-4 bg-[#1E5FA0] hover:bg-[#1a5090] text-white rounded-full font-bold text-lg shadow-xl shadow-[#1E5FA0]/30 transition-all"
-            >
-              <Phone className="w-5 h-5" />
-              <span>{t.footer.callUs}</span>
-              <span className={`text-sm font-normal opacity-80 ${isRTL ? 'mr-1' : 'ml-1'}`} dir="ltr">+966 50 476 4145</span>
-            </motion.a>
-          </motion.div>
+          
 
           {/* Footer Grid */}
           <div className="grid md:grid-cols-3 gap-12 mb-12">
