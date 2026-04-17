@@ -9,7 +9,7 @@ import { FooterVideo } from "./components/FooterVideo";
 type Language = 'ar' | 'en';
 type Theme = 'dark' | 'light';
 
-const PHONE_NUMBER = "966504764145";
+const PHONE_NUMBER = "966577570217";
 const WHATSAPP_URL = `https://wa.me/${PHONE_NUMBER}`;
 const PHONE_URL = `tel:+${PHONE_NUMBER}`;
 const NAV_OFFSET = 96;
