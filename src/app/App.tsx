@@ -890,7 +890,7 @@ export default function App() {
                   {t.footer.location}
                 </p>
                 <a href="mailto:info@afaq.sa" className="block hover:text-[#F48120] transition-colors">info@afaq.sa</a>
-                <a href={PHONE_URL} className="block hover:text-[#F48120] transition-colors" dir="ltr">{PHONE_URL}</a>
+                <a href={PHONE_URL} className="block hover:text-[#F48120] transition-colors" >{PHONE_URL}</a>
               </div>
             </div>
 
