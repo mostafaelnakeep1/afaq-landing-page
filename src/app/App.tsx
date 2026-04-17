@@ -889,7 +889,7 @@ export default function App() {
                   <MapPin className="w-4 h-4 text-[#F48120] flex-shrink-0" />
                   {t.footer.location}
                 </p>
-                <a href="mailto:infoo@afaq.sa" className="block hover:text-[#F48120] transition-colors">info@afaq.sa</a>
+                <a href="mailto:info@afaq.sa" className="block hover:text-[#F48120] transition-colors">info@afaq.sa</a>
                 <a href={PHONE_URL} className="block hover:text-[#F48120] transition-colors" dir="ltr">+966 50 476 4145</a>
               </div>
             </div>
